@@ -21,8 +21,6 @@ function prefixWithProjectPath(fileList: string[]): string[] {
     return prefixedList;
 }
 
-
-
 function changeDefaultSortOrder() {
     const workspaceConfig = vscode.workspace.getConfiguration('explorer');
     workspaceConfig.update('sortOrder', 'modified', vscode.ConfigurationTarget.Workspace);
