@@ -8,6 +8,7 @@ let stringToAdd = "-a";
 function changeSortOrder() {
     const workspaceConfig = vscode.workspace.getConfiguration('explorer');
     workspaceConfig.update('sortOrder', 'modified', vscode.ConfigurationTarget.Workspace);
+    console.log("sort changed to modify");
 }
 
 function getConfig(): string[] {
@@ -26,7 +27,7 @@ function getProjectPath(): string {
     return workspacePath;
 }
 
-function appendStringToFiles(fileList:string[],stringToAdd:string): void {
+function appendStringToFiles(fileList: string[], stringToAdd: string): void {
     let workspacePath = getProjectPath();
     for (let filename of fileList) {
         console.log(filename);
@@ -36,9 +37,11 @@ function appendStringToFiles(fileList:string[],stringToAdd:string): void {
 }
 
 export function activate(context: vscode.ExtensionContext) {
+    changeSortOrder();
+
     vscode.workspace.onDidSaveTextDocument((document) => {
         let fileOrder = getConfig();
-        appendStringToFiles(fileOrder,stringToAdd);
+        appendStringToFiles(fileOrder, stringToAdd);
         console.log("re order completed");
     });
 }
