@@ -1,11 +1,29 @@
 import * as vscode from 'vscode';
-import { readFileSync, appendFileSync } from 'fs';
+import { readFileSync, appendFileSync, utimesSync } from 'fs';
 
 let configName = '.order';
 let stringToAdd = "-a";
 
+function modifyLastChangedDateForFiles(fileList: string[]) {
+    // Get current date and time
+    const newModifiedDate = new Date();
+    for (let path of fileList) {
+        utimesSync(path, newModifiedDate, newModifiedDate);
+    }
+}
 
-function changeSortOrder() {
+function prefixWithProjectPath(fileList: string[]): string[] {
+    let workspacePath = getProjectPath();
+    let prefixedList: string[] = [];
+    for (let filename of fileList) {
+        prefixedList.push(workspacePath + filename);
+    }
+    return prefixedList;
+}
+
+
+
+function changeDefaultSortOrder() {
     const workspaceConfig = vscode.workspace.getConfiguration('explorer');
     workspaceConfig.update('sortOrder', 'modified', vscode.ConfigurationTarget.Workspace);
     console.log("sort changed to modify");
@@ -28,20 +46,22 @@ function getProjectPath(): string {
 }
 
 function appendStringToFiles(fileList: string[], stringToAdd: string): void {
-    let workspacePath = getProjectPath();
-    for (let filename of fileList) {
-        console.log(filename);
-        let filePath = workspacePath + filename;
-        appendFileSync(filePath, stringToAdd, 'utf8');
+    fileList = prefixWithProjectPath(fileList);
+    for (let path of fileList) {
+        console.log(path);
+        appendFileSync(path, stringToAdd, 'utf8');
     }
 }
 
 export function activate(context: vscode.ExtensionContext) {
-    changeSortOrder();
+    changeDefaultSortOrder();
 
     vscode.workspace.onDidSaveTextDocument((document) => {
         let fileOrder = getConfig();
-        appendStringToFiles(fileOrder, stringToAdd);
+        //appendStringToFiles(fileOrder, stringToAdd);
+        let filePaths = prefixWithProjectPath(fileOrder);
+        modifyLastChangedDateForFiles(filePaths);
+
         console.log("re order completed");
     });
 }

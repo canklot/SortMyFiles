@@ -2,7 +2,7 @@
   "name": "CustomOrderFiles",
   "displayName": "CustomOrderFiles",
   "description": "Re-order files and folder as you wish in VSCode",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "engines": {
     "vscode": "^1.96.0"
   },
