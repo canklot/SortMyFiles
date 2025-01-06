@@ -14,11 +14,6 @@
     "onDidSaveTextDocument"
   ],
   "main": "./out/extension.js",
-  "contributes": {
-    "commands": [
-      {}
-    ]
-  },
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
@@ -40,6 +35,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/username/repository-name.git"
+    "url": "https://github.com/canklot/CustomOrderFiles"
   }
 }
