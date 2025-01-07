@@ -1,25 +1,18 @@
-# CustomOrderFiles README
+# CustomOrderFiles
 
-Re-order files and folder as you wish in VS Code. Create a file named `.order` in the root of your workspace.
-List file names in the order you wish. One line for one file name. Example:
+Re-order files and folders in VS Code explorer. Create a file named `.order` in the root of your workspace.
+List the file names in the order you wish. One line for a file. Example:
 
     ImportantFile.js
     LessImportantFile.js
-    AnotherFile.js
+    MyFolder/AnotherFile.js
 
 ## How it works
 
-Add a custom string to end of the files listed in `.order` file.
 Changes file sorting to last modified date.
+Everytime a save detected extension activates.
+Changes the last modified date of the files specified in the `.order` file.
 Only works if you open a worspace (folder)
-
-## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-You can change the default string added to the end of the files using the below
-But in the future because I have not added that feature yet.
-
-* `myExtension.enable`: Enable/disable this extension.
 
 ## Known Issues
 
@@ -27,10 +20,8 @@ You can create a issue on projects github page
 
 ## Release Notes
 
-### 1.0.0
+### 0.0.3
 
 Initial release of extension
 
----
 
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
