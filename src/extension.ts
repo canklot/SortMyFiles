@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 import { readFileSync, appendFileSync, utimesSync } from 'fs';
 
 let configName = '.order';
-let stringToAdd = "-a";
 
 function modifyLastChangedDateForFiles(fileList: string[]) {
     // Get current date and time
@@ -43,20 +42,12 @@ function getProjectPath(): string {
     return workspacePath;
 }
 
-function appendStringToFiles(fileList: string[], stringToAdd: string): void {
-    fileList = prefixWithProjectPath(fileList);
-    for (let path of fileList) {
-        console.log(path);
-        appendFileSync(path, stringToAdd, 'utf8');
-    }
-}
-
 export function activate(context: vscode.ExtensionContext) {
     changeDefaultSortOrder();
 
     vscode.workspace.onDidSaveTextDocument((document) => {
+
         let fileOrder = getConfig();
-        //appendStringToFiles(fileOrder, stringToAdd);
         let filePaths = prefixWithProjectPath(fileOrder);
         modifyLastChangedDateForFiles(filePaths);
 
