@@ -4,9 +4,10 @@ import { readFileSync, appendFileSync, utimesSync } from 'fs';
 let configName = '.order';
 
 function modifyLastChangedDateForFiles(fileList: string[]) {
-    // Get current date and time
+    let milliseconds = 1000;
     for (let path of fileList) {
-        let newModifiedDate = new Date();
+        let newModifiedDate = new Date(Date.now() + milliseconds);
+        milliseconds += 1000;
         utimesSync(path, newModifiedDate, newModifiedDate);
     }
 }
@@ -21,7 +22,7 @@ function prefixWithProjectPath(fileList: string[]): string[] {
 }
 
 function changeDefaultSortOrder() {
-    const workspaceConfig = vscode.workspace.getConfiguration('explorer');
+    let workspaceConfig = vscode.workspace.getConfiguration('explorer');
     workspaceConfig.update('sortOrder', 'modified', vscode.ConfigurationTarget.Workspace);
     console.log("sort changed to modify");
 }
@@ -29,7 +30,7 @@ function changeDefaultSortOrder() {
 function getConfig(): string[] {
     let customOrderPath = getProjectPath() + configName;
     let fileContent = readFileSync(customOrderPath, 'utf-8');
-    const lines = fileContent.split(/\r?\n/); // Handles both Windows and Unix line endings
+    let lines = fileContent.split(/\r?\n/); // Handles both Windows and Unix line endings
     lines.reverse();
     return lines;
 }
@@ -46,6 +47,7 @@ function sortFiles() {
     let fileOrder = getConfig();
     let filePaths = prefixWithProjectPath(fileOrder);
     modifyLastChangedDateForFiles(filePaths);
+    console.log("Sorting completed");
 }
 
 export function activate(context: vscode.ExtensionContext) {
@@ -54,7 +56,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     vscode.workspace.onDidSaveTextDocument((document) => {
         sortFiles();
-        console.log("re order completed");
+
     });
 }
 
