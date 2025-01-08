@@ -5,8 +5,8 @@ let configName = '.order';
 
 function modifyLastChangedDateForFiles(fileList: string[]) {
     // Get current date and time
-    const newModifiedDate = new Date();
     for (let path of fileList) {
+        let newModifiedDate = new Date();
         utimesSync(path, newModifiedDate, newModifiedDate);
     }
 }
@@ -42,15 +42,18 @@ function getProjectPath(): string {
     return workspacePath;
 }
 
+function sortFiles() {
+    let fileOrder = getConfig();
+    let filePaths = prefixWithProjectPath(fileOrder);
+    modifyLastChangedDateForFiles(filePaths);
+}
+
 export function activate(context: vscode.ExtensionContext) {
     changeDefaultSortOrder();
 
     vscode.workspace.onDidSaveTextDocument((document) => {
 
-        let fileOrder = getConfig();
-        let filePaths = prefixWithProjectPath(fileOrder);
-        modifyLastChangedDateForFiles(filePaths);
-
+        sortFiles();
         console.log("re order completed");
     });
 }

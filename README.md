@@ -3,9 +3,12 @@
 Re-order files and folders in VS Code explorer. Create a file named `.order` in the root of your workspace.
 List the file names in the order you wish. One line for a file. Example:
 
+    VeryImportantFolder
+    MyFolder/MyCode.js
+    MyFolder/MyLibrary.js
     ImportantFile.js
     LessImportantFile.js
-    MyFolder/AnotherFile.js
+
 
 ## How it works
 
@@ -18,7 +21,7 @@ Only works if you open a worspace (folder)
 
 ## Known Issues
 
-You can create a issue on projects github page
+Folders are always displayed first.
 
 ## Release Notes
 
