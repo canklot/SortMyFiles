@@ -50,9 +50,9 @@ function sortFiles() {
 
 export function activate(context: vscode.ExtensionContext) {
     changeDefaultSortOrder();
+    sortFiles();
 
     vscode.workspace.onDidSaveTextDocument((document) => {
-
         sortFiles();
         console.log("re order completed");
     });
