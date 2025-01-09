@@ -23,6 +23,8 @@ Only works if you open a worspace (folder)
 
 Folders are always displayed first.
 
+If you face any problems in `OUTPUT` tab you can select `CustomOrderExtension` from the drop-down menu and check the logs.
+
 ## Release Notes
 
 ### 0.0.3

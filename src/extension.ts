@@ -2,13 +2,21 @@ import * as vscode from 'vscode';
 import { readFileSync, appendFileSync, utimesSync } from 'fs';
 
 let configName = '.order';
+const outputChannel = vscode.window.createOutputChannel('CustomOrderExtension');
 
 function modifyLastChangedDateForFiles(fileList: string[]) {
+
     let milliseconds = 1000;
     for (let path of fileList) {
-        let newModifiedDate = new Date(Date.now() + milliseconds);
-        milliseconds += 1000;
-        utimesSync(path, newModifiedDate, newModifiedDate);
+        try {
+            let newModifiedDate = new Date(Date.now() + milliseconds);
+            milliseconds += 1000;
+            utimesSync(path, newModifiedDate, newModifiedDate);
+        } catch (error) {
+            outputChannel.appendLine(`Failed to modify last changed date for file: ${path}`);
+            outputChannel.appendLine(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            outputChannel.appendLine(''); // Add a blank line for readability
+        }
     }
 }
 
@@ -24,7 +32,7 @@ function prefixWithProjectPath(fileList: string[]): string[] {
 function changeDefaultSortOrder() {
     let workspaceConfig = vscode.workspace.getConfiguration('explorer');
     workspaceConfig.update('sortOrder', 'modified', vscode.ConfigurationTarget.Workspace);
-    console.log("sort changed to modify");
+    outputChannel.appendLine("sort changed to modify");
 }
 
 function getConfig(): string[] {
@@ -44,20 +52,36 @@ function getProjectPath(): string {
 }
 
 function sortFiles() {
-    let fileOrder = getConfig();
+    let fileOrder: string[];
+    try {
+        fileOrder = getConfig();
+    } catch (error) {
+        if (error instanceof URIError) {
+            outputChannel.appendLine("Workspace path not detected. Please open a workspace.");
+        } else if (error instanceof Error && error.message.includes('ENOENT')) {
+            outputChannel.appendLine(`Config file "${configName}" not found.`);
+        } else if (error instanceof Error) {
+            outputChannel.appendLine(`Failed to load configuration: ${error.message}`);
+        } else {
+            outputChannel.appendLine('An unknown error occurred.');
+        }
+        return; // Exit the function if the config could not be loaded
+    }
     let filePaths = prefixWithProjectPath(fileOrder);
     modifyLastChangedDateForFiles(filePaths);
-    console.log("Sorting completed");
+    outputChannel.appendLine("Sorting completed");
 }
 
 export function activate(context: vscode.ExtensionContext) {
-    changeDefaultSortOrder();
-    sortFiles();
-
     vscode.workspace.onDidSaveTextDocument((document) => {
         sortFiles();
 
     });
+
+    changeDefaultSortOrder();
+    sortFiles();
+
+
 }
 
 export function deactivate() { }
