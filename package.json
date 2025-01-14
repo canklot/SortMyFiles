@@ -1,8 +1,8 @@
 {
-  "name": "CustomOrderFiles",
-  "displayName": "CustomOrderFiles",
+  "name": "SortMyFiles",
+  "displayName": "SortMyFiles",
   "description": "Re-order files and folder as you wish in VSCode",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "engines": {
     "vscode": "^1.96.0"
   },
@@ -37,6 +37,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/canklot/CustomOrderFiles"
+    "url": "https://github.com/canklot/SortMyFiles"
   }
 }

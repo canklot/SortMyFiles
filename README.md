@@ -1,4 +1,4 @@
-# CustomOrderFiles VSCode Extension
+# SortMyFiles VSCode Extension
 
 Re-order files and folders in VS Code explorer. Create a file named `.order` in the root of your workspace.
 List the file names in the order you wish. One line for a file. Example:
@@ -23,7 +23,7 @@ Only works if you open a worspace (folder)
 
 Folders are always displayed first.
 
-If you face any problems in `OUTPUT` tab you can select `CustomOrderExtension` from the drop-down menu and check the logs.
+If you face any problems, you can find the logs in `OUTPUT` tab. From the drop-down menu you can select `CustomOrderExtension`  and check the logs.
 
 ## Release Notes
 
