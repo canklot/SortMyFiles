@@ -17,13 +17,13 @@ Everytime a save detected extension activates.
 Changes the last modified date of the files specified in the `.order` file.
 Only works if you open a worspace (folder)
 
-[VSCode Marketplace Page](https://marketplace.visualstudio.com/items?itemName=CanklotSoftware.CustomOrderFiles)
+[VSCode Marketplace Page](https://marketplace.visualstudio.com/items?itemName=CanklotSoftware.SortMyFiles)
 
 ## Known Issues
 
 Folders are always displayed first.
 
-If you face any problems, you can find the logs in `OUTPUT` tab. From the drop-down menu you can select `CustomOrderExtension`  and check the logs.
+If you face any problems, you can find the logs in `OUTPUT` tab. From the drop-down menu you can select `SortMyFiles`  and check the logs.
 
 ## Release Notes
 
