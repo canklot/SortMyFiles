@@ -32,7 +32,7 @@ BEFORE             |  AFTER
 
 ## Release Notes
 
-### 0.0.3
+### 0.1.0
 
 Initial release of extension
 

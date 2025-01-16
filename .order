@@ -1,6 +1,9 @@
 src
 src/extension.ts
 images
+images/before.png
+images/after.png
+images/icon128.png
 todo.md
 README.md
 package.json
