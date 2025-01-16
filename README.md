@@ -9,7 +9,6 @@ List the file names in the order you wish. One line for a file. Example:
     ImportantFile.js
     LessImportantFile.js
 
-
 ## How it works
 
 Changes file sorting to last modified date.
@@ -24,6 +23,12 @@ Only works if you open a worspace (folder)
 Folders are always displayed first.
 
 If you face any problems, you can find the logs in `OUTPUT` tab. From the drop-down menu you can select `SortMyFiles`  and check the logs.
+
+## Screen Shots
+
+BEFORE             |  AFTER
+:-------------------------:|:-------------------------:
+![](images/before.png)  |  ![](images/after.png)
 
 ## Release Notes
 

@@ -1,5 +1,6 @@
 src
 src/extension.ts
+images
 todo.md
 README.md
 package.json
