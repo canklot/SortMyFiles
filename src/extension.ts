@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { readFileSync, appendFileSync, utimesSync } from 'fs';
 
 let configName = '.order';
-const outputChannel = vscode.window.createOutputChannel('CustomOrderExtension');
+const outputChannel = vscode.window.createOutputChannel('SortMyFiles');
 
 function modifyLastChangedDateForFiles(fileList: string[]) {
 
@@ -29,10 +29,10 @@ function prefixWithProjectPath(fileList: string[]): string[] {
     return prefixedList;
 }
 
-function changeDefaultSortOrder() {
+function changeDefaultSortOrder(newValue: string) {
     let workspaceConfig = vscode.workspace.getConfiguration('explorer');
-    workspaceConfig.update('sortOrder', 'modified', vscode.ConfigurationTarget.Workspace);
-    outputChannel.appendLine("sort changed to modify");
+    workspaceConfig.update('sortOrder', newValue, vscode.ConfigurationTarget.Workspace);
+    outputChannel.appendLine("sort changed to " + newValue);
 }
 
 function getConfig(): string[] {
@@ -75,13 +75,11 @@ function sortFiles() {
 export function activate(context: vscode.ExtensionContext) {
     vscode.workspace.onDidSaveTextDocument((document) => {
         sortFiles();
-
     });
-
-    changeDefaultSortOrder();
+    changeDefaultSortOrder('modified');
     sortFiles();
-
-
 }
 
-export function deactivate() { }
+export function deactivate() {
+    changeDefaultSortOrder('default');
+}
