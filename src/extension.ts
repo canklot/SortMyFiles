@@ -33,7 +33,6 @@ function getGitignoreFiles(): string[] {
 }
 
 async function getAllFilesInWorkspace() {
-    let workspacePath = getProjectPath();
     let fileList: string[] = [];
     let removedComments = getGitignoreFiles().filter(item => item.charAt(0) !== '#');
     let removedEmptyLines = removedComments.filter(item => item !== '');
@@ -45,7 +44,9 @@ async function getAllFilesInWorkspace() {
     // `*/bin`
     // `{*/obj,*/bin}`
     let uris = await vscode.workspace.findFiles('', ignorePatterns, 10000);
-
+    let workspace = vscode.workspace.workspaceFolders?.map(folder => folder.uri).at(0);
+    if (!workspace) { throw new URIError("No workspace detected"); }
+    let allFolders = await vscode.workspace.fs.readDirectory(workspace);
 
     for (let uri of uris) {
         let path = uri.path.slice(1); // remove the first slash
@@ -74,7 +75,8 @@ function getConfig(): string[] {
     let fileContent = readFileSync(customOrderPath, 'utf-8');
     let lines = fileContent.split(/\r?\n/); // Handles both Windows and Unix line endings
     lines.reverse();
-    return lines;
+    let filePaths = prefixWithProjectPath(lines);
+    return filePaths;
 }
 
 function getProjectPath(): string {
@@ -85,11 +87,12 @@ function getProjectPath(): string {
     return workspacePath;
 }
 
-function sortFiles() {
+async function sortFiles() {
     let fileOrder: string[];
     try {
         fileOrder = getConfig();
     } catch (error) {
+        // Exception handling should be done in the getconfig function not here
         if (error instanceof URIError) {
             outputChannel.appendLine("Workspace path not detected. Please open a workspace.");
         } else if (error instanceof Error && error.message.includes('ENOENT')) {
@@ -101,8 +104,13 @@ function sortFiles() {
         }
         return; // Exit the function if the config could not be loaded
     }
-    let filePaths = prefixWithProjectPath(fileOrder);
-    modifyLastChangedDateForFiles(filePaths);
+
+    modifyLastChangedDateForFiles(fileOrder);
+    let allFilesInWorkspace = await getAllFilesInWorkspace();
+    let restOfTheFiles = allFilesInWorkspace.filter(file => !fileOrder.includes(file));
+    let alpahabeticalllySortedFiles = restOfTheFiles.sort();
+    modifyLastChangedDateForFiles(alpahabeticalllySortedFiles);
+
     outputChannel.appendLine("Sorting completed");
 }
 
