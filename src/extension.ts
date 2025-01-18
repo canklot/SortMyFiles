@@ -20,6 +20,40 @@ function modifyLastChangedDateForFiles(fileList: string[]) {
     }
 }
 
+function getGitignoreFiles(): string[] {
+    try {
+        let workspacePath = getProjectPath();
+        let gitignorePath = workspacePath + '.gitignore';
+        let fileContent = readFileSync(gitignorePath, 'utf-8');
+        let lines = fileContent.split(/\r?\n/); // Handles both Windows and Unix line endings
+        return lines;
+    } catch (error) {
+        return [];
+    }
+}
+
+async function getAllFilesInWorkspace() {
+    let workspacePath = getProjectPath();
+    let fileList: string[] = [];
+    let removedComments = getGitignoreFiles().filter(item => item.charAt(0) !== '#');
+    let removedEmptyLines = removedComments.filter(item => item !== '');
+    let prefixedGitignoreFiles = removedEmptyLines.map(file => "**/" + file + "**");
+    let trimmedGitignoreFiles = prefixedGitignoreFiles.map(file => file.trim());
+    let ignorePatterns = trimmedGitignoreFiles.join(',');
+    ignorePatterns = `{${ignorePatterns}}`;
+    // `{${ignorePatterns}}`
+    // `*/bin`
+    // `{*/obj,*/bin}`
+    let uris = await vscode.workspace.findFiles('', ignorePatterns, 10000);
+
+
+    for (let uri of uris) {
+        let path = uri.path.slice(1); // remove the first slash
+        fileList.push(path);
+    }
+    return fileList;
+}
+
 function prefixWithProjectPath(fileList: string[]): string[] {
     let workspacePath = getProjectPath();
     let prefixedList: string[] = [];
@@ -75,6 +109,8 @@ function sortFiles() {
 export function activate(context: vscode.ExtensionContext) {
     vscode.workspace.onDidSaveTextDocument((document) => {
         sortFiles();
+        let allFiles = getAllFilesInWorkspace();
+        console.log(allFiles);
     });
     changeDefaultSortOrder('modified');
     sortFiles();
