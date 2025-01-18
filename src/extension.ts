@@ -6,11 +6,11 @@ const outputChannel = vscode.window.createOutputChannel('SortMyFiles');
 
 function modifyLastChangedDateForFiles(fileList: string[]) {
 
-    let milliseconds = 1000;
+    let milliseconds = 0;
     for (let path of fileList) {
         try {
             let newModifiedDate = new Date(Date.now() + milliseconds);
-            milliseconds += 1000;
+            milliseconds += 1;
             utimesSync(path, newModifiedDate, newModifiedDate);
         } catch (error) {
             outputChannel.appendLine(`Failed to modify last changed date for file: ${path}`);
