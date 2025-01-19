@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
 import { readFileSync, appendFileSync, utimesSync } from 'fs';
+import { getProjectPath, prefixWithProjectPath } from './projectPath';
+import { getAllFilesInWorkspace } from './findFiles';
 
 let configName = '.order';
 const outputChannel = vscode.window.createOutputChannel('SortMyFiles');
@@ -20,49 +22,7 @@ function modifyLastChangedDateForFiles(fileList: string[]) {
     }
 }
 
-function getGitignoreFiles(): string[] {
-    try {
-        let workspacePath = getProjectPath();
-        let gitignorePath = workspacePath + '.gitignore';
-        let fileContent = readFileSync(gitignorePath, 'utf-8');
-        let lines = fileContent.split(/\r?\n/); // Handles both Windows and Unix line endings
-        return lines;
-    } catch (error) {
-        return [];
-    }
-}
 
-async function getAllFilesInWorkspace() {
-    let fileList: string[] = [];
-    let removedComments = getGitignoreFiles().filter(item => item.charAt(0) !== '#');
-    let removedEmptyLines = removedComments.filter(item => item !== '');
-    let prefixedGitignoreFiles = removedEmptyLines.map(file => "**/" + file + "**");
-    let trimmedGitignoreFiles = prefixedGitignoreFiles.map(file => file.trim());
-    let ignorePatterns = trimmedGitignoreFiles.join(',');
-    ignorePatterns = `{${ignorePatterns}}`;
-    // `{${ignorePatterns}}`
-    // `*/bin`
-    // `{*/obj,*/bin}`
-    let uris = await vscode.workspace.findFiles('', ignorePatterns, 10000);
-    let workspace = vscode.workspace.workspaceFolders?.map(folder => folder.uri).at(0);
-    if (!workspace) { throw new URIError("No workspace detected"); }
-    let allFolders = await vscode.workspace.fs.readDirectory(workspace);
-
-    for (let uri of uris) {
-        let path = uri.path.slice(1); // remove the first slash
-        fileList.push(path);
-    }
-    return fileList;
-}
-
-function prefixWithProjectPath(fileList: string[]): string[] {
-    let workspacePath = getProjectPath();
-    let prefixedList: string[] = [];
-    for (let filename of fileList) {
-        prefixedList.push(workspacePath + filename);
-    }
-    return prefixedList;
-}
 
 function changeDefaultSortOrder(newValue: string) {
     let workspaceConfig = vscode.workspace.getConfiguration('explorer');
@@ -79,13 +39,6 @@ function getConfig(): string[] {
     return filePaths;
 }
 
-function getProjectPath(): string {
-    let workspaceUriPath = vscode.workspace.workspaceFolders?.map(folder => folder.uri.path).at(0);
-    if (!workspaceUriPath) { throw new URIError("No workspace detected"); }
-    let workspacePath = workspaceUriPath.slice(1);
-    workspacePath = workspacePath + "/";
-    return workspacePath;
-}
 
 async function sortFiles() {
     let fileOrder: string[];
@@ -114,11 +67,10 @@ async function sortFiles() {
     outputChannel.appendLine("Sorting completed");
 }
 
+
 export function activate(context: vscode.ExtensionContext) {
     vscode.workspace.onDidSaveTextDocument((document) => {
         sortFiles();
-        let allFiles = getAllFilesInWorkspace();
-        console.log(allFiles);
     });
     changeDefaultSortOrder('modified');
     sortFiles();
