@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { readFileSync, appendFileSync, utimesSync } from 'fs';
 import { getProjectPath, prefixWithProjectPath } from './projectPath';
-import { getAllFilesInWorkspace } from './findFiles';
+import { getAllFilesInWorkspace,getAllFilesInWorkspaceWaiter } from './findFiles';
 
 let configName = '.order';
 const outputChannel = vscode.window.createOutputChannel('SortMyFiles');
@@ -71,9 +71,11 @@ async function sortFiles() {
 export function activate(context: vscode.ExtensionContext) {
     vscode.workspace.onDidSaveTextDocument((document) => {
         sortFiles();
+        getAllFilesInWorkspaceWaiter();
     });
     changeDefaultSortOrder('modified');
     sortFiles();
+    
 }
 
 export function deactivate() {
