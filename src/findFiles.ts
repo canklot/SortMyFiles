@@ -42,49 +42,28 @@ export async function getAllFilesInWorkspace() {
 }
 
 // -----------------
-export async function recursivelyFindFolders(folderUri: vscode.Uri, folderUris: Set<string>) {
-    try {
-        const entries = await vscode.workspace.fs.readDirectory(folderUri);
 
-        for (const [entryName, entryType] of entries) {
-            const entryUri = vscode.Uri.joinPath(folderUri, entryName);
+export async function recursivelyFindFilesAndFoldersWithignore(folderUri: vscode.Uri, folderUris: Set<string>, ignorePattern: string) {
 
-            if (entryType === vscode.FileType.Directory) {
-                // Add the folder URI to the set
-                folderUris.add(entryUri.toString());
+    const entries = await vscode.workspace.fs.readDirectory(folderUri);
 
-                // Recursively search for more folders inside
-                await recursivelyFindFolders(entryUri, folderUris);
-            }
+    for (const [entryName, entryType] of entries) {
+        const entryUri = vscode.Uri.joinPath(folderUri, entryName);
+
+        // Check if the current folder fits the ignore pattern
+        if (minimatch(entryUri.fsPath, ignorePattern)) {
+            continue;
         }
-    } catch (error) {
-        console.error(`Error reading directory at ${folderUri.fsPath}:`, error);
-    }
-}
+        // Add the folder URI to the set
+        folderUris.add(entryUri.toString());
+        if (entryType === vscode.FileType.Directory) {
 
-export async function recursivelyFindFoldersWithignore(folderUri: vscode.Uri, folderUris: Set<string>, ignorePattern: string) {
-    try {
-        const entries = await vscode.workspace.fs.readDirectory(folderUri);
 
-        for (const [entryName, entryType] of entries) {
-            const entryUri = vscode.Uri.joinPath(folderUri, entryName);
-
-            // Check if the current folder fits the ignore pattern
-            if (minimatch(entryUri.fsPath, ignorePattern)) {
-                continue;
-            }
-
-            if (entryType === vscode.FileType.Directory) {
-                // Add the folder URI to the set
-                folderUris.add(entryUri.toString());
-
-                // Recursively search for more folders inside
-                await recursivelyFindFoldersWithignore(entryUri, folderUris, ignorePattern);
-            }
+            // Recursively search for more folders inside
+            await recursivelyFindFilesAndFoldersWithignore(entryUri, folderUris, ignorePattern);
         }
-    } catch (error) {
-        console.error(`Error reading directory at ${folderUri.fsPath}:`, error);
     }
+
 }
 
 
@@ -94,6 +73,6 @@ export async function getAllFilesInWorkspaceWaiter() {
     if (!workspaceUri) { throw new URIError("No workspace detected"); }
     let allfolder = new Set<string>();
     let ignorePattern = getGitignoreFiles();
-    await recursivelyFindFoldersWithignore(workspaceUri, allfolder, ignorePattern);
+    await recursivelyFindFilesAndFoldersWithignore(workspaceUri, allfolder, ignorePattern);
     return allfolder;
 }
