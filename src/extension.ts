@@ -1,13 +1,12 @@
 import * as vscode from 'vscode';
 import { readFileSync, appendFileSync, utimesSync } from 'fs';
 import { getProjectPath, prefixWithProjectPath } from './projectPath';
-import { getAllFilesInWorkspace,getAllFilesInWorkspaceWaiter } from './findFiles';
-
-let configName = '.order';
-const outputChannel = vscode.window.createOutputChannel('SortMyFiles');
+import { findAllFilesAndFoldersWithIgnore, getGitignoreFiles } from './findFiles';
+import { outputChannel } from './logging';
+import { getConfig } from './config';
+import { alpahabeticalllySortFiles } from './sortingFunctions';
 
 function modifyLastChangedDateForFiles(fileList: string[]) {
-
     let milliseconds = 0;
     for (let path of fileList) {
         try {
@@ -22,60 +21,41 @@ function modifyLastChangedDateForFiles(fileList: string[]) {
     }
 }
 
-
-
 function changeDefaultSortOrder(newValue: string) {
     let workspaceConfig = vscode.workspace.getConfiguration('explorer');
     workspaceConfig.update('sortOrder', newValue, vscode.ConfigurationTarget.Workspace);
     outputChannel.appendLine("sort changed to " + newValue);
 }
 
-function getConfig(): string[] {
-    let customOrderPath = getProjectPath() + configName;
-    let fileContent = readFileSync(customOrderPath, 'utf-8');
-    let lines = fileContent.split(/\r?\n/); // Handles both Windows and Unix line endings
-    lines.reverse();
-    let filePaths = prefixWithProjectPath(lines);
-    return filePaths;
+async function sortFiles() {
+    let fileOrder = getConfig();
+    modifyLastChangedDateForFiles(fileOrder);
+    sortNonConfigFiles(fileOrder);
+    outputChannel.appendLine("Sorting completed");
 }
 
+async function sortNonConfigFiles(config: string[] = []) {
+    let workspaceUri = vscode.workspace.workspaceFolders?.map(folder => folder.uri).at(0);
+    if (!workspaceUri) { throw new URIError("No workspace detected"); }
+    let filesAndFolders = new Set<string>();
+    let ignorePattern = getGitignoreFiles();
 
-async function sortFiles() {
-    let fileOrder: string[];
-    try {
-        fileOrder = getConfig();
-    } catch (error) {
-        // Exception handling should be done in the getconfig function not here
-        if (error instanceof URIError) {
-            outputChannel.appendLine("Workspace path not detected. Please open a workspace.");
-        } else if (error instanceof Error && error.message.includes('ENOENT')) {
-            outputChannel.appendLine(`Config file "${configName}" not found.`);
-        } else if (error instanceof Error) {
-            outputChannel.appendLine(`Failed to load configuration: ${error.message}`);
-        } else {
-            outputChannel.appendLine('An unknown error occurred.');
-        }
-        return; // Exit the function if the config could not be loaded
-    }
-
-    modifyLastChangedDateForFiles(fileOrder);
-    let allFilesInWorkspace = await getAllFilesInWorkspace();
-    let restOfTheFiles = allFilesInWorkspace.filter(file => !fileOrder.includes(file));
-    let alpahabeticalllySortedFiles = restOfTheFiles.sort();
-    modifyLastChangedDateForFiles(alpahabeticalllySortedFiles);
-
-    outputChannel.appendLine("Sorting completed");
+    await findAllFilesAndFoldersWithIgnore(workspaceUri, filesAndFolders, ignorePattern);
+    let nonConfigFilesAndFolders = Array.from(filesAndFolders).filter(name => !config.includes(name));
+    let alpahabeticalllySorted = alpahabeticalllySortFiles(nonConfigFilesAndFolders);
+    modifyLastChangedDateForFiles(alpahabeticalllySorted);
 }
 
 
 export function activate(context: vscode.ExtensionContext) {
     vscode.workspace.onDidSaveTextDocument((document) => {
+        // Everytime a save detected, sort the files
         sortFiles();
-        getAllFilesInWorkspaceWaiter();
     });
+    // Run the sortFiles function when the extension is activated
     changeDefaultSortOrder('modified');
     sortFiles();
-    
+
 }
 
 export function deactivate() {

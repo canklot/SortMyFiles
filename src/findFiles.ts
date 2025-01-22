@@ -4,7 +4,7 @@ import { getProjectPath, prefixWithProjectPath } from './projectPath';
 import { minimatch } from "minimatch";
 
 // -----------------
-function getGitignoreFiles(): string {
+export function getGitignoreFiles(): string {
     try {
         let workspacePath = getProjectPath();
         let gitignorePath = workspacePath + '.gitignore';
@@ -43,36 +43,32 @@ export async function getAllFilesInWorkspace() {
 
 // -----------------
 
-export async function recursivelyFindFilesAndFoldersWithignore(folderUri: vscode.Uri, folderUris: Set<string>, ignorePattern: string) {
-
+export async function findAllFilesAndFoldersWithIgnore(folderUri: vscode.Uri, resultSet: Set<string>, ignorePattern: string) {
+    // Finds all files and folders in the workspace and saves them to the set provided
+    // You might need to await the results.
     const entries = await vscode.workspace.fs.readDirectory(folderUri);
-
     for (const [entryName, entryType] of entries) {
         const entryUri = vscode.Uri.joinPath(folderUri, entryName);
-
         // Check if the current folder fits the ignore pattern
         if (minimatch(entryUri.fsPath, ignorePattern)) {
             continue;
         }
         // Add the folder URI to the set
-        folderUris.add(entryUri.toString());
+        // remove the first slash from the uri
+        resultSet.add(entryUri.path.slice(1));
         if (entryType === vscode.FileType.Directory) {
-
-
-            // Recursively search for more folders inside
-            await recursivelyFindFilesAndFoldersWithignore(entryUri, folderUris, ignorePattern);
+            // If result is a directory, recursively call the function
+            await findAllFilesAndFoldersWithIgnore(entryUri, resultSet, ignorePattern);
         }
     }
-
 }
 
-
-
-export async function getAllFilesInWorkspaceWaiter() {
+async function EXAMPLEgetAllFilesInWorkspaceWaiter() {
+    //delete this function
     let workspaceUri = vscode.workspace.workspaceFolders?.map(folder => folder.uri).at(0);
     if (!workspaceUri) { throw new URIError("No workspace detected"); }
-    let allfolder = new Set<string>();
+    let allFilesFolders = new Set<string>();
     let ignorePattern = getGitignoreFiles();
-    await recursivelyFindFilesAndFoldersWithignore(workspaceUri, allfolder, ignorePattern);
-    return allfolder;
+    await findAllFilesAndFoldersWithIgnore(workspaceUri, allFilesFolders, ignorePattern);
+    return allFilesFolders;
 }
