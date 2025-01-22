@@ -14,6 +14,7 @@ List the file names in the order you wish. One line for a file. Example:
 Changes file sorting to last modified date.
 Everytime a save detected extension activates.
 Changes the last modified date of the files specified in the `.order` file.
+Sorts rest of the files alphabetically.
 Only works if you open a worspace (folder)
 
 [VSCode Marketplace Page](https://marketplace.visualstudio.com/items?itemName=CanklotSoftware.SortMyFiles)
