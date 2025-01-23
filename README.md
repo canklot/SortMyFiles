@@ -37,7 +37,7 @@ BEFORE             |  AFTER
 
 Initial release of extension
 
-### 0.2.0
+### 0.1.3
 
 Sort rest of the files alphabetically
 
