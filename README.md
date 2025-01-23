@@ -37,4 +37,11 @@ BEFORE             |  AFTER
 
 Initial release of extension
 
+### 0.2.0
+
+Sort rest of the files alphabetically
+
+# Buy me a coffe
+https://buymeacoffee.com/canklot
+
 
