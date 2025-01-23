@@ -13,6 +13,7 @@ function modifyLastChangedDateForFiles(fileList: string[]) {
             let newModifiedDate = new Date(Date.now() + milliseconds);
             milliseconds += 1;
             utimesSync(path, newModifiedDate, newModifiedDate);
+            //outputChannel.appendLine(path);
         } catch (error) {
             outputChannel.appendLine(`Failed to modify last changed date for file: ${path}`);
             outputChannel.appendLine(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -29,12 +30,13 @@ function changeDefaultSortOrder(newValue: string) {
 
 async function sortFiles() {
     let fileOrder = getConfig();
-    modifyLastChangedDateForFiles(fileOrder);
-    sortNonConfigFiles(fileOrder);
+    let sortedNonConfigFiles = await sortNonConfigFiles(fileOrder);
+    let combinedList = [...sortedNonConfigFiles, ...fileOrder];
+    modifyLastChangedDateForFiles(combinedList);
     outputChannel.appendLine("Sorting completed");
 }
 
-async function sortNonConfigFiles(config: string[] = []) {
+async function sortNonConfigFiles(config: string[] = []): Promise<string[]> {
     let workspaceUri = vscode.workspace.workspaceFolders?.map(folder => folder.uri).at(0);
     if (!workspaceUri) { throw new URIError("No workspace detected"); }
     let filesAndFolders = new Set<string>();
@@ -43,7 +45,8 @@ async function sortNonConfigFiles(config: string[] = []) {
     await findAllFilesAndFoldersWithIgnore(workspaceUri, filesAndFolders, ignorePattern);
     let nonConfigFilesAndFolders = Array.from(filesAndFolders).filter(name => !config.includes(name));
     let alpahabeticalllySorted = alpahabeticalllySortFiles(nonConfigFilesAndFolders);
-    modifyLastChangedDateForFiles(alpahabeticalllySorted);
+    //modifyLastChangedDateForFiles(alpahabeticalllySorted);
+    return alpahabeticalllySorted;
 }
 
 

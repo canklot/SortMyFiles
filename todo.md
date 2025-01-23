@@ -1,7 +1,8 @@
-### Sort rest of the files alphabetically - DONE
+### Sort rest of the files alphabetically - DONE - Needs fix - I fixed it 
 - Sort the files not listed in the .order file alphabetically.
 - Get all files and FOLDERS from workspace. Substact the files from order file.
 - Call changeModifyDate function in alpabetical order
+- gitignore only works for files not folder. I need to exclude the ignore folders from fileandfolders list
 ### Add custom sort function selector (Maybe)
 - Users can contribute to the code and add their custom sort functions to sortingFunctions.ts
 - Add a selector to VS code to change the active sorting function.
@@ -27,6 +28,8 @@
 - I am not sure if line endings are all working on linux
 ### Update screenshots
 - After sort alphabetical order I need to update the screenshots
+### Clean the code
+- I dont have time right now. I need finish my other project before the deadline. 
 ---
 Read the guidelines one day.
 * [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)

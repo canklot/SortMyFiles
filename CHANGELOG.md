@@ -1,9 +1,13 @@
 # Change Log
 
-All notable changes to the extension will be documented in this file.
+Some notable changes to the extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
+## Version: 0.1.0
 
 - Initial release
+
+## Version: 0.1.3
+
+- Sort rest of the files alphabetically.
