@@ -1,5 +1,6 @@
 src
 src/extension.ts
+src/findFiles.ts
 images
 images/before.png
 images/after.png
