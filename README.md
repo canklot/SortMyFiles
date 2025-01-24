@@ -1,13 +1,16 @@
 # SortMyFiles VSCode Extension
 
 Re-order files and folders in VS Code explorer. Create a file named `.order` in the root of your workspace.
-List the file names in the order you wish. One line for a file. Example:
+List the file names in the order you wish. One line for a file. You can also use regex if you put `(regex)` at the start of the line.
+
+Example `.order` file:
 
     VeryImportantFolder
     MyFolder/MyCode.js
     MyFolder/MyLibrary.js
     ImportantFile.js
     LessImportantFile.js
+    (regex)*.json
 
 ## How it works
 
@@ -40,6 +43,10 @@ Initial release of extension
 ### 0.1.3
 
 Sort rest of the files alphabetically
+
+### 0.1.4
+
+Regex support
 
 # Buy me a coffe
 https://buymeacoffee.com/canklot

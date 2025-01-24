@@ -2,7 +2,7 @@
 ### Add custom sort function selector (Maybe)
 - Users can contribute to the code and add their custom sort functions to sortingFunctions.ts
 - Add a selector to VS code to change the active sorting function.
-### Add wildcart support
+### Add wildcart support (Done)
 - Put every .ts file to the top for example
 - Add a tag to some lines in .order file to mark them as regular expression. Dont hardcode the tag.
 - Some tag ideas: (regularEXP) (regex)
