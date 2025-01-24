@@ -3,7 +3,7 @@ import { readFileSync, appendFileSync, utimesSync } from 'fs';
 import { getProjectPath, prefixWithProjectPath } from './projectPath';
 import { findAllFilesAndFoldersWithIgnore, getGitignoreFiles } from './findFiles';
 import { outputChannel } from './logging';
-import { getConfig } from './config';
+import { getConfig, getRegexLines,regularExpressionTag } from './config';
 import { alpahabeticalllySortFiles } from './sortingFunctions';
 
 function modifyLastChangedDateForFiles(fileList: string[]) {
@@ -30,13 +30,23 @@ function changeDefaultSortOrder(newValue: string) {
 
 async function sortFiles() {
     let fileOrder = getConfig();
-    let sortedNonConfigFiles = await sortNonConfigFiles(fileOrder);
-    let combinedList = [...sortedNonConfigFiles, ...fileOrder];
+    fileOrder = fileOrder.filter(line => !line.startsWith(regularExpressionTag));
+    let prefixedFileOrder = prefixWithProjectPath(fileOrder);
+    let sortedNonConfigFiles = await getNonConfigFilesSorted();
+    let combinedList = [...sortedNonConfigFiles, ...prefixedFileOrder];
     modifyLastChangedDateForFiles(combinedList);
     outputChannel.appendLine("Sorting completed");
 }
 
-async function sortNonConfigFiles(config: string[] = []): Promise<string[]> {
+function putFilesFitsToRegexPatternToEnd(fileOrder: string[], regexLines: string[]): string[] {
+    // remote regex tag from regex lines and get the files that fits to regex pattern
+    let filesFitsToRegexPattern = fileOrder.filter(file => regexLines.some(regex => file.match(regex.slice(8))));
+    let filesNotFitsToRegexPattern = fileOrder.filter(file => !filesFitsToRegexPattern.includes(file));
+    return [...filesNotFitsToRegexPattern, ...filesFitsToRegexPattern];
+}
+
+async function getNonConfigFilesSorted(): Promise<string[]> {
+    let config = getConfig();
     let workspaceUri = vscode.workspace.workspaceFolders?.map(folder => folder.uri).at(0);
     if (!workspaceUri) { throw new URIError("No workspace detected"); }
     let filesAndFolders = new Set<string>();
@@ -45,9 +55,10 @@ async function sortNonConfigFiles(config: string[] = []): Promise<string[]> {
     await findAllFilesAndFoldersWithIgnore(workspaceUri, filesAndFolders, ignorePattern);
     let nonConfigFilesAndFolders = Array.from(filesAndFolders).filter(name => !config.includes(name));
     let alpahabeticalllySorted = alpahabeticalllySortFiles(nonConfigFilesAndFolders);
-    //modifyLastChangedDateForFiles(alpahabeticalllySorted);
-    return alpahabeticalllySorted;
+    let regexSorted = putFilesFitsToRegexPatternToEnd(alpahabeticalllySorted, getRegexLines(config));
+    return regexSorted;
 }
+
 
 
 export function activate(context: vscode.ExtensionContext) {

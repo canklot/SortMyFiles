@@ -3,7 +3,6 @@ import { readFileSync, appendFileSync, utimesSync } from 'fs';
 import { getProjectPath, prefixWithProjectPath } from './projectPath';
 import { minimatch } from "minimatch";
 
-// -----------------
 export function getGitignoreFiles(): string {
     try {
         let workspacePath = getProjectPath();
@@ -22,26 +21,6 @@ export function getGitignoreFiles(): string {
         return "";
     }
 }
-export async function getAllFilesInWorkspace() {
-    let fileList: string[] = [];
-
-    // `{${ignorePatterns}}`
-    // `*/bin`
-    // `{*/obj,*/bin}`
-    let ignorePatterns = getGitignoreFiles();
-    let uris = await vscode.workspace.findFiles('', ignorePatterns, 10000);
-    let workspace = vscode.workspace.workspaceFolders?.map(folder => folder.uri).at(0);
-    if (!workspace) { throw new URIError("No workspace detected"); }
-    let allFolders = await vscode.workspace.fs.readDirectory(workspace);
-
-    for (let uri of uris) {
-        let path = uri.path.slice(1); // remove the first slash
-        fileList.push(path);
-    }
-    return fileList;
-}
-
-// -----------------
 
 export async function findAllFilesAndFoldersWithIgnore(folderUri: vscode.Uri, resultSet: Set<string>, ignorePattern: string) {
     // Finds all files and folders in the workspace and saves them to the set provided
@@ -61,14 +40,4 @@ export async function findAllFilesAndFoldersWithIgnore(folderUri: vscode.Uri, re
             await findAllFilesAndFoldersWithIgnore(entryUri, resultSet, ignorePattern);
         }
     }
-}
-
-async function EXAMPLEgetAllFilesInWorkspaceWaiter() {
-    //delete this function
-    let workspaceUri = vscode.workspace.workspaceFolders?.map(folder => folder.uri).at(0);
-    if (!workspaceUri) { throw new URIError("No workspace detected"); }
-    let allFilesFolders = new Set<string>();
-    let ignorePattern = getGitignoreFiles();
-    await findAllFilesAndFoldersWithIgnore(workspaceUri, allFilesFolders, ignorePattern);
-    return allFilesFolders;
 }

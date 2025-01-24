@@ -3,6 +3,7 @@ import { readFileSync, appendFileSync, utimesSync } from 'fs';
 import { outputChannel } from './logging';
 
 let configName = '.order';
+export let regularExpressionTag = "(regex)";
 
 function configReader(): string[] {
     let customOrderPath = getProjectPath() + configName;
@@ -11,8 +12,13 @@ function configReader(): string[] {
     let removedEmptyLines = lines.filter(item => item !== '');
     let trimmed = removedEmptyLines.map(file => file.trim());
     trimmed.reverse();
-    let filePaths = prefixWithProjectPath(trimmed);
-    return filePaths;
+    //let filePaths = prefixWithProjectPath(trimmed);
+    return trimmed;
+}
+
+export function getRegexLines(lines: string[]): string[] {
+    let regexLines = lines.filter(line => line.startsWith(regularExpressionTag));
+    return regexLines;
 }
 
 export function getConfig(): string[] {
