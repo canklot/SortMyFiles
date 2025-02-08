@@ -15,3 +15,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ### 0.1.4
 
 - Regex support
+
+### 0.1.5
+
+- Linux support
