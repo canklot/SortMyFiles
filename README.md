@@ -48,6 +48,10 @@ Sort rest of the files alphabetically
 
 Regex support
 
+### 0.1.5
+
+Linux support
+
 # Buy me a coffe
 
 <a href="https://www.buymeacoffee.com/canklot" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
