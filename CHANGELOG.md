@@ -19,3 +19,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ### 0.1.5
 
 - Linux support
+
+### 0.1.6
+
+- Had to bumb version to push a clean build. No new features.

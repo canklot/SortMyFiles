@@ -27,8 +27,8 @@
 - Auto save might say file contents are newer do you want to override it. Maybe increasing autosave delay a few second in vscode settings can mitigate the issue. Or maybe I can put miliseconds between files instead of seconds
 ### Probably wont work if multiple workspaces are open in the same editor
 - I dont think many people use multiple workspaces in the same editor anyways
-### Test on Linux
-- I am not sure if line endings are all working on linux
+### Test on Linux (Tested)
+- I am not sure if line endings are all working on linux. Ok I fixed it. Now its working
 ### Clean the code
 - I dont have time right now. I need finish my other project before the deadline.
 ### Optimize
