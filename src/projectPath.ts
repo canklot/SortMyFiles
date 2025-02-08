@@ -1,14 +1,16 @@
 import * as vscode from 'vscode';
 import { readFileSync, appendFileSync, utimesSync } from 'fs';
+import * as path from 'path';
 
 export function getProjectPath(): string {
-    let workspaceUriPath = vscode.workspace.workspaceFolders?.map(folder => folder.uri.path).at(0);
-    if (!workspaceUriPath) { throw new URIError("No workspace detected"); }
-    let workspacePath = workspaceUriPath.slice(1);
-    workspacePath = workspacePath + "/";
-    return workspacePath;
-}
+    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+    if (!workspaceFolder) { throw new URIError("No workspace detected"); }
+    let workspaceUriPath = workspaceFolder.uri.fsPath;
+    //let normalizedPath = path.normalize(workspaceUriPath);
+    workspaceUriPath = workspaceUriPath + path.sep;
+    return workspaceUriPath;
 
+}
 export function prefixWithProjectPath(fileList: string[]): string[] {
     let workspacePath = getProjectPath();
     let prefixedList: string[] = [];

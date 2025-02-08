@@ -34,7 +34,7 @@ export async function findAllFilesAndFoldersWithIgnore(folderUri: vscode.Uri, re
         }
         // Add the folder URI to the set
         // remove the first slash from the uri
-        resultSet.add(entryUri.path.slice(1));
+        resultSet.add(entryUri.fsPath);
         if (entryType === vscode.FileType.Directory) {
             // If result is a directory, recursively call the function
             await findAllFilesAndFoldersWithIgnore(entryUri, resultSet, ignorePattern);

@@ -3,7 +3,7 @@ import { readFileSync, appendFileSync, utimesSync } from 'fs';
 import { getProjectPath, prefixWithProjectPath } from './projectPath';
 import { findAllFilesAndFoldersWithIgnore, getGitignoreFiles } from './findFiles';
 import { outputChannel } from './logging';
-import { getConfig, getRegexLines,regularExpressionTag } from './config';
+import { getConfig, getRegexLines, regularExpressionTag } from './config';
 import { alpahabeticalllySortFiles } from './sortingFunctions';
 
 function modifyLastChangedDateForFiles(fileList: string[]) {
@@ -30,6 +30,10 @@ function changeDefaultSortOrder(newValue: string) {
 
 async function sortFiles() {
     let fileOrder = getConfig();
+    if (fileOrder.length === 0) {
+        // if config does not exist do nothing
+        return;
+    }
     fileOrder = fileOrder.filter(line => !line.startsWith(regularExpressionTag));
     let prefixedFileOrder = prefixWithProjectPath(fileOrder);
     let sortedNonConfigFiles = await getNonConfigFilesSorted();

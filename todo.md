@@ -30,7 +30,9 @@
 ### Test on Linux
 - I am not sure if line endings are all working on linux
 ### Clean the code
-- I dont have time right now. I need finish my other project before the deadline. 
+- I dont have time right now. I need finish my other project before the deadline.
+### Optimize
+- Some functions called again for everyfile. For example get project path is called once for every file. Maybe cache results and call it once.
 ---
 Read the guidelines one day.
 * [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
