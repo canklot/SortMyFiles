@@ -3,8 +3,9 @@ import { readFileSync, appendFileSync, utimesSync } from 'fs';
 import { getProjectPath, prefixWithProjectPath } from './projectPath';
 import { findAllFilesAndFoldersWithIgnore, getGitignoreFiles } from './findFiles';
 import { outputChannel } from './logging';
-import { getConfig, getRegexLines, regularExpressionTag } from './config';
+import { getConfig, getRegexLines, regularExpressionTag, getConfigMode, ConfigMode } from './config';
 import { alpahabeticalllySortFiles } from './sortingFunctions';
+import { hugoSortFiles } from './hugoSorting';
 
 function modifyLastChangedDateForFiles(fileList: string[]) {
     let milliseconds = 0;
@@ -29,16 +30,27 @@ function changeDefaultSortOrder(newValue: string) {
 }
 
 async function sortFiles() {
-    let fileOrder = getConfig();
-    if (fileOrder.length === 0) {
-        // if config does not exist do nothing
-        return;
+    // Get current config mode
+    const configMode = getConfigMode();
+
+    if (configMode === ConfigMode.ORDER) {
+        // In .order mode, we need a config file
+        let fileOrder = getConfig();
+        if (fileOrder.length === 0) {
+            // if config does not exist in .order mode, do nothing
+            return;
+        }
+        fileOrder = fileOrder.filter(line => !line.startsWith(regularExpressionTag));
+        let prefixedFileOrder = prefixWithProjectPath(fileOrder);
+        let sortedNonConfigFiles = await getNonConfigFilesSorted();
+        let combinedList = [...sortedNonConfigFiles, ...prefixedFileOrder];
+        modifyLastChangedDateForFiles(combinedList);
+    } else if (configMode === ConfigMode.HUGO) {
+        // In Hugo mode, we just sort all files using the Hugo sorting algorithm
+        let sortedFiles = await getNonConfigFilesSorted();
+        modifyLastChangedDateForFiles(sortedFiles);
     }
-    fileOrder = fileOrder.filter(line => !line.startsWith(regularExpressionTag));
-    let prefixedFileOrder = prefixWithProjectPath(fileOrder);
-    let sortedNonConfigFiles = await getNonConfigFilesSorted();
-    let combinedList = [...sortedNonConfigFiles, ...prefixedFileOrder];
-    modifyLastChangedDateForFiles(combinedList);
+
     outputChannel.appendLine("Sorting completed");
 }
 
@@ -58,9 +70,20 @@ async function getNonConfigFilesSorted(): Promise<string[]> {
 
     await findAllFilesAndFoldersWithIgnore(workspaceUri, filesAndFolders, ignorePattern);
     let nonConfigFilesAndFolders = Array.from(filesAndFolders).filter(name => !config.includes(name));
-    let alpahabeticalllySorted = alpahabeticalllySortFiles(nonConfigFilesAndFolders);
-    let regexSorted = putFilesFitsToRegexPatternToEnd(alpahabeticalllySorted, getRegexLines(config));
-    return regexSorted;
+
+    // Use different sorting strategies based on the selected mode
+    const configMode = getConfigMode();
+
+    if (configMode === ConfigMode.HUGO) {
+        // In Hugo mode, use the Hugo-specific sorting algorithm
+        outputChannel.appendLine("Using Hugo mode sorting");
+        return hugoSortFiles(nonConfigFilesAndFolders);
+    } else {
+        // In .order mode, use the original sorting algorithm
+        let alpahabeticalllySorted = alpahabeticalllySortFiles(nonConfigFilesAndFolders);
+        let regexSorted = putFilesFitsToRegexPatternToEnd(alpahabeticalllySorted, getRegexLines(config));
+        return regexSorted;
+    }
 }
 
 

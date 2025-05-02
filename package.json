@@ -16,6 +16,19 @@
     "onDidSaveTextDocument"
   ],
   "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "SortMyFiles",
+      "properties": {
+        "sortmyfiles.configMode": {
+          "type": "string",
+          "default": ".order",
+          "enum": [".order", "Hugo"],
+          "description": "Determines whether to use '.order' file or Hugo weight system for sorting"
+        }
+      }
+    }
+  },
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
