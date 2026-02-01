@@ -4,6 +4,7 @@ import { outputChannel } from './logging';
 
 let configName = '.order';
 export let regularExpressionTag = "(regex)";
+export let bottomTag = "(bottom)";
 
 function configReader(): string[] {
     let customOrderPath = getProjectPath() + configName;
@@ -21,8 +22,7 @@ export function getRegexLines(lines: string[]): string[] {
     return regexLines;
 }
 
-export function getConfig(): string[] {
-    // Public function with exception handling
+export function getOrder(): string[] {
     let fileOrder: string[];
     try {
         fileOrder = configReader();

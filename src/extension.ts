@@ -3,7 +3,7 @@ import { readFileSync, appendFileSync, utimesSync } from 'fs';
 import { getProjectPath, prefixWithProjectPath } from './projectPath';
 import { findAllFilesAndFoldersWithIgnore, getGitignoreFiles } from './findFiles';
 import { outputChannel } from './logging';
-import { getConfig, getRegexLines, regularExpressionTag } from './config';
+import { getOrder, getRegexLines, regularExpressionTag } from './config';
 import { alpahabeticalllySortFiles } from './sortingFunctions';
 
 function modifyLastChangedDateForFiles(fileList: string[]) {
@@ -29,13 +29,13 @@ function changeDefaultSortOrder(newValue: string) {
 }
 
 async function sortFiles() {
-    let fileOrder = getConfig();
+    let fileOrder = getOrder();
     if (fileOrder.length === 0) {
         // if config does not exist do nothing
         return;
     }
-    fileOrder = fileOrder.filter(line => !line.startsWith(regularExpressionTag));
-    let prefixedFileOrder = prefixWithProjectPath(fileOrder);
+    let regexRemovedFileOrder: string[] = fileOrder.filter(line => !line.startsWith(regularExpressionTag));
+    let prefixedFileOrder = prefixWithProjectPath(regexRemovedFileOrder);
     let sortedNonConfigFiles = await getNonConfigFilesSorted();
     let combinedList = [...sortedNonConfigFiles, ...prefixedFileOrder];
     modifyLastChangedDateForFiles(combinedList);
@@ -43,26 +43,26 @@ async function sortFiles() {
 }
 
 function putFilesFitsToRegexPatternToEnd(fileOrder: string[], regexLines: string[]): string[] {
-    // remote regex tag from regex lines and get the files that fits to regex pattern
-    let filesFitsToRegexPattern = fileOrder.filter(file => regexLines.some(regex => file.match(regex.slice(8))));
+    let tagEndIndex: number = regularExpressionTag.length+1;
+    // remove regex tag from regex lines and get the files that fits to regex pattern
+    let filesFitsToRegexPattern = fileOrder.filter(file => regexLines.some(regex => file.match(regex.slice(tagEndIndex))));
     let filesNotFitsToRegexPattern = fileOrder.filter(file => !filesFitsToRegexPattern.includes(file));
     return [...filesNotFitsToRegexPattern, ...filesFitsToRegexPattern];
 }
 
 async function getNonConfigFilesSorted(): Promise<string[]> {
-    let config = getConfig();
+    let order = getOrder();
     let workspaceUri = vscode.workspace.workspaceFolders?.map(folder => folder.uri).at(0);
     if (!workspaceUri) { throw new URIError("No workspace detected"); }
     let filesAndFolders = new Set<string>();
     let ignorePattern = getGitignoreFiles();
 
     await findAllFilesAndFoldersWithIgnore(workspaceUri, filesAndFolders, ignorePattern);
-    let nonConfigFilesAndFolders = Array.from(filesAndFolders).filter(name => !config.includes(name));
+    let nonConfigFilesAndFolders = Array.from(filesAndFolders).filter(name => !order.includes(name));
     let alpahabeticalllySorted = alpahabeticalllySortFiles(nonConfigFilesAndFolders);
-    let regexSorted = putFilesFitsToRegexPatternToEnd(alpahabeticalllySorted, getRegexLines(config));
+    let regexSorted = putFilesFitsToRegexPatternToEnd(alpahabeticalllySorted, getRegexLines(order));
     return regexSorted;
 }
-
 
 
 export function activate(context: vscode.ExtensionContext) {
