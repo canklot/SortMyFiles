@@ -54,10 +54,10 @@ async function getNonConfigFilesSorted(): Promise<string[]> {
     let order = getOrder();
     let workspaceUri = vscode.workspace.workspaceFolders?.map(folder => folder.uri).at(0);
     if (!workspaceUri) { throw new URIError("No workspace detected"); }
-    let filesAndFolders = new Set<string>();
-    let ignorePattern = getGitignoreFiles();
+    
+    
 
-    await findAllFilesAndFoldersWithIgnore(workspaceUri, filesAndFolders, ignorePattern);
+    let filesAndFolders = await findAllFilesAndFoldersWithIgnore(workspaceUri);
     let nonConfigFilesAndFolders = Array.from(filesAndFolders).filter(name => !order.includes(name));
     let alpahabeticalllySorted = alpahabeticalllySortFiles(nonConfigFilesAndFolders);
     let regexSorted = putFilesFitsToRegexPatternToEnd(alpahabeticalllySorted, getRegexLines(order));
