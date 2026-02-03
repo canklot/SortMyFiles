@@ -2,9 +2,9 @@ src
 src/extension.ts
 src/findFiles.ts
 images
+images/icon128.png
 images/before.png
 images/after.png
-images/icon128.png
 todo.md
 README.md
 package.json

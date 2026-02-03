@@ -24,9 +24,14 @@ export function getGitignoreFiles(): string {
     }
 }
 
-export async function findAllFilesAndFoldersWithIgnore(folderUri: vscode.Uri, resultSet: Set<string>, ignorePattern: string) {
+export async function findAllFilesAndFoldersWithIgnore(folderUri: vscode.Uri): Promise<Set<string>> {
     // Finds all files and folders in the workspace and saves them to the set provided
     // You might need to await the results.
+    // Why did I use sets? I dont remember.
+    
+    let resultSet = new Set<string>();
+    let ignorePattern = getGitignoreFiles();
+
     const entries = await vscode.workspace.fs.readDirectory(folderUri);
     for (const [entryName, entryType] of entries) {
         const entryUri = vscode.Uri.joinPath(folderUri, entryName);
@@ -38,7 +43,9 @@ export async function findAllFilesAndFoldersWithIgnore(folderUri: vscode.Uri, re
         resultSet.add(entryUri.fsPath);
         if (entryType === vscode.FileType.Directory) {
             // If result is a directory, recursively call the function
-            await findAllFilesAndFoldersWithIgnore(entryUri, resultSet, ignorePattern);
+            let subfolderFiles = await findAllFilesAndFoldersWithIgnore(entryUri);
+            resultSet = new Set([...resultSet, ...subfolderFiles]);
         }
     }
+    return resultSet;
 }
