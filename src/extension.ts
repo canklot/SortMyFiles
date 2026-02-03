@@ -29,13 +29,12 @@ function changeDefaultSortOrder(newValue: string) {
 }
 
 async function sortFiles() {
-    let fileOrder = getOrder();
+    let fileOrder = await getOrder();
     if (fileOrder.length === 0) {
         // if config does not exist do nothing
         return;
     }
-    let regexRemovedFileOrder: string[] = fileOrder.filter(line => !line.startsWith(regularExpressionTag));
-    let prefixedFileOrder = prefixWithProjectPath(regexRemovedFileOrder);
+    let prefixedFileOrder = prefixWithProjectPath(fileOrder);
     let sortedNonConfigFiles = await getNonConfigFilesSorted();
     let combinedList = [...sortedNonConfigFiles, ...prefixedFileOrder];
     modifyLastChangedDateForFiles(combinedList);
@@ -51,17 +50,14 @@ function putFilesFitsToRegexPatternToEnd(fileOrder: string[], regexLines: string
 }
 
 async function getNonConfigFilesSorted(): Promise<string[]> {
-    let order = getOrder();
+    let order = await getOrder();
     let workspaceUri = vscode.workspace.workspaceFolders?.map(folder => folder.uri).at(0);
     if (!workspaceUri) { throw new URIError("No workspace detected"); }
     
-    
-
     let filesAndFolders = await findAllFilesAndFoldersWithIgnore(workspaceUri);
     let nonConfigFilesAndFolders = Array.from(filesAndFolders).filter(name => !order.includes(name));
     let alpahabeticalllySorted = alpahabeticalllySortFiles(nonConfigFilesAndFolders);
-    let regexSorted = putFilesFitsToRegexPatternToEnd(alpahabeticalllySorted, getRegexLines(order));
-    return regexSorted;
+    return alpahabeticalllySorted;
 }
 
 
