@@ -3,7 +3,7 @@ import { readFileSync, appendFileSync, utimesSync } from 'fs';
 import { getProjectPath, prefixWithProjectPath } from './projectPath';
 import { findAllFilesAndFoldersWithIgnore, getGitignoreFiles } from './findFiles';
 import { outputChannel } from './logging';
-import { getOrder, getRegexLines, regularExpressionTag } from './config';
+import { getOrder, regularExpressionTag } from './config';
 import { alpahabeticalllySortFiles } from './sortingFunctions';
 
 function modifyLastChangedDateForFiles(fileList: string[]) {
@@ -42,8 +42,9 @@ async function sortFiles() {
 }
 
 function putFilesFitsToRegexPatternToEnd(fileOrder: string[], regexLines: string[]): string[] {
-    let tagEndIndex: number = regularExpressionTag.length+1;
+    // obselete delete later
     // remove regex tag from regex lines and get the files that fits to regex pattern
+    let tagEndIndex: number = regularExpressionTag.length+1;
     let filesFitsToRegexPattern = fileOrder.filter(file => regexLines.some(regex => file.match(regex.slice(tagEndIndex))));
     let filesNotFitsToRegexPattern = fileOrder.filter(file => !filesFitsToRegexPattern.includes(file));
     return [...filesNotFitsToRegexPattern, ...filesFitsToRegexPattern];

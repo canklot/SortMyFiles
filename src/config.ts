@@ -23,10 +23,11 @@ async function configReader(): Promise<string[]> {
     return regexReplaced;
 }
 
-export function getRegexLines(lines: string[]): string[] {
+/* export function getRegexLines(lines: string[]): string[] {
+    // Not in use anymore, I can modify it to be used for bottom tag.
     let regexLines = lines.filter(line => line.startsWith(regularExpressionTag));
     return regexLines;
-}
+} */
 
 export async function getOrder(): Promise<string[]> {
     let fileOrder: string[];
@@ -48,6 +49,7 @@ export async function getOrder(): Promise<string[]> {
 }
 
 function getFilesFitsToSingleRegexPattern(files: string[], pattern: string): string[] {
+    // remove regex tag from pattern and get the files that fits to regex pattern
     let tagEndIndex = regularExpressionTag.length ;
     let slicedPattern = pattern.slice(tagEndIndex);
     const myregex = new RegExp(slicedPattern);
@@ -63,7 +65,7 @@ function replaceRegexWithMatchedFiles(files: string[], order: string[]): string[
             let replaceIndex = copyOrder.indexOf(order[index]);
             let projectPathRemovedMatchedFiles = removeProjectPath(matchedFiles);
             let backslashRemovedMatchedFiles = projectPathRemovedMatchedFiles.map(s => s.replaceAll("\\", "/"));
-            copyOrder.splice(replaceIndex, 1, ...backslashRemovedMatchedFiles); //need to replace double back slashes with slashes
+            copyOrder.splice(replaceIndex, 1, ...backslashRemovedMatchedFiles); 
         }
     }
     return copyOrder;

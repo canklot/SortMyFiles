@@ -25,9 +25,8 @@ export function getGitignoreFiles(): string {
 }
 
 export async function findAllFilesAndFoldersWithIgnore(folderUri: vscode.Uri): Promise<Set<string>> {
-    // Finds all files and folders in the workspace and saves them to the set provided
-    // You might need to await the results.
-    // Why did I use sets? I dont remember.
+    // Finds all files and folders in the workspace
+    // Why did I use sets? I dont remember. Maybe something to do with duplicates.
     
     let resultSet = new Set<string>();
     let ignorePattern = getGitignoreFiles();
